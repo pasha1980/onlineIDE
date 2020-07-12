@@ -75,12 +75,6 @@ class ProjectInfo
     private $updatedAt;
 
     /**
-     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="projectInfos")
-     * @ORM\JoinColumn(nullable=false)
-     */
-    private $user;
-
-    /**
      * @ORM\OneToMany(targetEntity=ProjectStatistics::class, mappedBy="projectInfo")
      */
     private $projectStatistics;
@@ -89,6 +83,12 @@ class ProjectInfo
      * @ORM\OneToMany(targetEntity=File::class, mappedBy="project")
      */
     private $files;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="projectInfos")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $user;
 
     public function __construct()
     {
@@ -233,18 +233,6 @@ class ProjectInfo
         return $this;
     }
 
-    public function getUser(): ?User
-    {
-        return $this->user;
-    }
-
-    public function setUser(?User $user): self
-    {
-        $this->user = $user;
-
-        return $this;
-    }
-
     /**
      * @return Collection|ProjectStatistics[]
      */
@@ -303,6 +291,18 @@ class ProjectInfo
                 $file->setProject(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): self
+    {
+        $this->user = $user;
 
         return $this;
     }

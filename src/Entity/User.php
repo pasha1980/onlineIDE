@@ -6,11 +6,12 @@ use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
  */
-class User
+class User implements UserInterface
 {
     /**
      * @ORM\Id()
@@ -20,29 +21,25 @@ class User
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=100)
+     * @ORM\Column(type="string", length=180, unique=true)
      */
     private $nickname;
 
     /**
-     * @ORM\Column(type="string", length=100)
+     * @ORM\Column(type="json")
      */
-    private $email;
+    private $roles = [];
 
     /**
-     * @ORM\Column(type="string", length=100)
+     * @var string The hashed password
+     * @ORM\Column(type="string")
      */
     private $password;
 
     /**
-     * @ORM\Column(type="string", length=2000, nullable=true)
+     * @ORM\Column(type="string", length=255)
      */
-    private $description;
-
-    /**
-     * @ORM\Column(type="string", length=100, nullable=true)
-     */
-    private $company;
+    private $email;
 
     /**
      * @ORM\Column(type="datetime")
@@ -55,13 +52,23 @@ class User
     private $updatedAt;
 
     /**
-     * @ORM\OneToMany(targetEntity=ProjectInfo::class, mappedBy="user")
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $company;
+
+    /**
+     * @ORM\Column(type="string", length=2000, nullable=true)
+     */
+    private $description;
+
+    /**
+     * @ORM\OneToMany(targetEntity=ProjectInfo::class, mappedBy="user", orphanRemoval=true)
      */
     private $projectInfos;
 
     public function __construct()
     {
-        $this->projectInfos = new ArrayCollection();
+        $this->prjectInfos = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -81,6 +88,66 @@ class User
         return $this;
     }
 
+    /**
+     * A visual identifier that represents this user.
+     *
+     * @see UserInterface
+     */
+    public function getUsername(): string
+    {
+        return (string) $this->nickname;
+    }
+
+    /**
+     * @see UserInterface
+     */
+    public function getRoles(): array
+    {
+        $roles = $this->roles;
+        // guarantee every user at least has ROLE_USER
+        $roles[] = 'ROLE_USER';
+        $roles[] = 'ROLE_ADMIN';
+        return array_unique($roles);
+    }
+
+    public function setRoles(array $roles): self
+    {
+        $this->roles = $roles;
+
+        return $this;
+    }
+
+    /**
+     * @see UserInterface
+     */
+    public function getPassword(): string
+    {
+        return (string) $this->password;
+    }
+
+    public function setPassword(string $password): self
+    {
+        $this->password = $password;
+
+        return $this;
+    }
+
+    /**
+     * @see UserInterface
+     */
+    public function getSalt()
+    {
+        // not needed when using the "bcrypt" algorithm in security.yaml
+    }
+
+    /**
+     * @see UserInterface
+     */
+    public function eraseCredentials()
+    {
+         $this->setPassword(null);
+    }
+
     public function getEmail(): ?string
     {
         return $this->email;
@@ -89,30 +156,6 @@ class User
     public function setEmail(string $email): self
     {
         $this->email = $email;
-
-        return $this;
-    }
-
-    public function getDescription(): ?string
-    {
-        return $this->description;
-    }
-
-    public function setDescription(?string $description): self
-    {
-        $this->description = $description;
-
-        return $this;
-    }
-
-    public function getCompany(): ?string
-    {
-        return $this->company;
-    }
-
-    public function setCompany(?string $company): self
-    {
-        $this->company = $company;
 
         return $this;
     }
@@ -141,44 +184,58 @@ class User
         return $this;
     }
 
+    public function getCompany(): ?string
+    {
+        return $this->company;
+    }
+
+    public function setCompany(string $company): self
+    {
+        $this->company = $company;
+
+        return $this;
+    }
+
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    public function setDescription(?string $description): self
+    {
+        $this->description = $description;
+
+        return $this;
+    }
+
     /**
      * @return Collection|ProjectInfo[]
      */
-    public function getProjectInfos(): Collection
+    public function getPrjectInfos(): Collection
     {
         return $this->projectInfos;
     }
 
-    public function addProjectInfo(ProjectInfo $projectInfo): self
+    public function addPrjectInfo(ProjectInfo $projectInfos): self
     {
-        if (!$this->projectInfos->contains($projectInfo)) {
-            $this->projectInfos[] = $projectInfo;
-            $projectInfo->setUser($this);
+        if (!$this->projectInfos->contains($projectInfos)) {
+            $this->$projectInfos[] = $projectInfos;
+            $projectInfos->setUser($this);
         }
 
         return $this;
     }
 
-    public function removeProjectInfo(ProjectInfo $projectInfo): self
+    public function removePrjectInfo(ProjectInfo $projectInfos): self
     {
-        if ($this->projectInfos->contains($projectInfo)) {
-            $this->projectInfos->removeElement($projectInfo);
+        if ($this->projectInfos->contains($projectInfos)) {
+            $this->projectInfos->removeElement($projectInfos);
             // set the owning side to null (unless already changed)
-            if ($projectInfo->getUser() === $this) {
-                $projectInfo->setUser(null);
+            if ($projectInfos->getUser() === $this) {
+                $projectInfos->setUser(null);
             }
         }
 
         return $this;
-    }
-
-    public function getPassword()
-    {
-        return $this->password;
-    }
-
-    public function setPassword($password): void
-    {
-        $this->password = $password;
     }
 }

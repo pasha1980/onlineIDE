@@ -29,7 +29,8 @@
         "symfony/validator": "5.0.*",
         "symfony/web-link": "5.0.*",
         "symfony/yaml": "5.0.*",
-        "twbs/bootstrap": "4.5.0"
+        "twbs/bootstrap": "4.5.0",
+      "ext-json": "*"
     },
     "require-dev": {
         "symfony/debug-pack": "*",
