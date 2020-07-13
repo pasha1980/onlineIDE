@@ -16,7 +16,9 @@ class HomeController extends AbstractController
     public function home(Request $request)
     {
         $log = false;
-        $user= $this->get('security.token_storage')->getToken()->getUser();
+        $user= $this->get('security.token_storage')
+            ->getToken()
+            ->getUser();
         if ($user != 'anon.')
         {
             $log = true;

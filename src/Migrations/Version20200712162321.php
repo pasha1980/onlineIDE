@@ -21,14 +21,14 @@ final class Version20200712162321 extends AbstractMigration
     {
         $this->addSql("insert into user set nickname = :nickname, roles = :roles, password = :password, email = :email, created_at = now(), updated_at = now(); ", [
             'nickname' => 'Admin_test',
-            'roles' => json_encode('ROLE_ADMIN'),
+            'roles' => json_encode(['ROLE_ADMIN']),
             'password' => password_hash('hrr6324047JG5U43Oe48../,.a=1pza;a3p',3),
             'email' => 'admin@test.com',
         ]);
 
         $this->addSql("insert into user set nickname = :nickname, roles = :roles, password = :password, email = :email, created_at = now(), updated_at = now(); ", [
             'nickname' => 'User_test',
-            'roles' => json_encode('ROLE_USER'),
+            'roles' => json_encode(['ROLE_USER']),
             'password' => password_hash('hrr6324047JGv5U43Oe48../,.a=1pza;a3p',3),
             'email' => 'user@test.com',
         ]);

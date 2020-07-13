@@ -6,10 +6,12 @@ use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
+ * @UniqueEntity(fields={"nickname"}, message="There is already an account with this nickname")
  */
 class User implements UserInterface
 {
@@ -125,7 +127,7 @@ class User implements UserInterface
         return (string) $this->password;
     }
 
-    public function setPassword(string $password): self
+    public function setPassword(?string $password): self
     {
         $this->password = $password;
 
@@ -145,7 +147,7 @@ class User implements UserInterface
      */
     public function eraseCredentials()
     {
-         $this->setPassword(null);
+//         $this->setPassword(null);
     }
 
     public function getEmail(): ?string

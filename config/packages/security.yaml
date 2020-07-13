@@ -1,7 +1,7 @@
 security:
     encoders:
         App\Entity\User:
-            algorithm: auto
+            algorithm: argon2id
 
     # https://symfony.com/doc/current/security.html#where-do-users-come-from-user-providers
     providers:
@@ -14,9 +14,19 @@ security:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
+
         main:
-            anonymous: lazy
+            pattern: ^/
+            anonymous: ~
             provider: app_user_provider
+            logout:
+                path: app_logout
+            guard:
+                authenticators:
+                    - App\Security\UserAuthenticator
+                # where to redirect after logout
+                # target: app_any_route
+
 
             # activate different ways to authenticate
             # https://symfony.com/doc/current/security.html#firewalls-authentication
@@ -27,5 +37,10 @@ security:
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
-        # - { path: ^/admin, roles: ROLE_ADMIN }
-        # - { path: ^/profile, roles: ROLE_USER }
+        - { path: ^/$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/login$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/register$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/, roles: ROLE_USER }
+#        - { path: ^/admin, roles: ROLE_ADMIN }
+
+
