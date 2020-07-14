@@ -4,6 +4,7 @@
 namespace App\Controller;
 
 
+use App\Service\UserDataService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
@@ -15,14 +16,7 @@ class HomeController extends AbstractController
      */
     public function home(Request $request)
     {
-        $log = false;
-        $user= $this->get('security.token_storage')
-            ->getToken()
-            ->getUser();
-        if ($user != 'anon.')
-        {
-            $log = true;
-        }
+        $log = UserDataService::isLogged($user= $this->get('security.token_storage')->getToken()->getUser());
         return $this->render('/home/home_page.html.twig', [
             'log' => $log,
             'user' => $user,

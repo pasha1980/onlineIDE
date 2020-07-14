@@ -1,5 +1,0 @@
-$this -> addSql("insert into user set nickname = :nickname, email = :email, password = :password, created_at = now(), updated_at = now();", [
-            'nickname' => 'Test1',
-            'email' => 'test1@gmail.com',
-            'password' => password_hash('rjb38-fm39???93iocja378//.,.haw', 3),
-        ]);

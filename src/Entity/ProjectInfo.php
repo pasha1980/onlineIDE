@@ -90,6 +90,11 @@ class ProjectInfo
      */
     private $user;
 
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $isOpen;
+
     public function __construct()
     {
         $this->projectStatistics = new ArrayCollection();
@@ -178,7 +183,7 @@ class ProjectInfo
         return $this->website;
     }
 
-    public function setWebsit(bool $website): self
+    public function setWebsite(bool $website): self
     {
         $this->website = $website;
 
@@ -303,6 +308,18 @@ class ProjectInfo
     public function setUser(?User $user): self
     {
         $this->user = $user;
+
+        return $this;
+    }
+
+    public function getIsOpen(): ?bool
+    {
+        return $this->isOpen;
+    }
+
+    public function setIsOpen(bool $isOpen): self
+    {
+        $this->isOpen = $isOpen;
 
         return $this;
     }

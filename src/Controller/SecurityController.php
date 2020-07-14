@@ -54,6 +54,15 @@ class SecurityController extends AbstractController
                     $form->get('plainPassword')->getData()
                 )
             );
+
+            /**
+             * @todo: release javascript: check if it is a space in name and replace ' ' with '_'
+             */
+
+            $name = $user->getNickname();
+            $newName = str_replace(' ', '_', $name);
+            $user->setNickname($newName);
+
             $user->setRoles(['ROLE_USER']);
             $user->setCreatedAt(new \DateTime('now'));
             $user->setUpdatedAt(new \DateTime('now'));
@@ -61,7 +70,12 @@ class SecurityController extends AbstractController
             $entityManager->persist($user);
             $entityManager->flush();
 
-            // do anything else you need here, like send an email
+            $path = str_replace('/src/Controller', '/Users/', __DIR__);
+            $createDir = mkdir($path . $user->getNickname(), 0777, false);
+            if(!$createDir)
+            {
+                return $this->redirectToRoute('/exception');
+            }
 
             return $guardHandler->authenticateUserAndHandleSuccess(
                 $user,
