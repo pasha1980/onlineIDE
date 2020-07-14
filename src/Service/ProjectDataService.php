@@ -13,8 +13,7 @@ class ProjectDataService
 {
     public static function pushCreatedProjectToDB(EntityManagerInterface $entityManager, ProjectInfo $projectInfo, User $user, int $config) :bool
     {
-        switch ($config)
-        {
+        switch ($config) {
             case 1:
                 $projectInfo->setCli(true);
                 $projectInfo->setWebsite(false);
@@ -66,13 +65,46 @@ class ProjectDataService
 
         $path = str_replace('/src/Service', '/Users/' . $uName . '/', __DIR__);
         $createDir = mkdir($path . $pName, 0777, true);
-        if($createDir)
-        {
+        if($createDir) {
             return true;
         } else {
             return false;
         }
 
+    }
+
+    public static function getProjectInfoForListing(array $projectList) :array
+    {
+        $info = [];
+        for ($i=0; $i < count($projectList); $i++)
+        {
+            if($projectList[$i]->getIsOpen()) {
+                $openClose = "Open";
+                $color = 'green';
+            } else {
+                $openClose = "Close";
+                $color = 'red';
+            }
+
+            if($projectList[$i]->getCli()) {
+                $type = 'Console project';
+            } elseif ($projectList[$i]->getlayout()) {
+                $type = 'Front-end project';
+            } elseif ($projectList[$i]->getWebsite()) {
+                $type = 'Website project';
+            } else {
+                $type = 'n/a';
+            }
+
+            $info[$i] = [
+                'number' => ($i+1),
+                'project' => $projectList[$i],
+                'openclose' => $openClose,
+                'type' => $type,
+                'color' => $color,
+            ];
+        }
+        return $info;
     }
 
 }

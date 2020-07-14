@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20200712162321 extends AbstractMigration
+final class Version20200714154204 extends AbstractMigration
 {
     public function getDescription() : string
     {
@@ -26,12 +26,6 @@ final class Version20200712162321 extends AbstractMigration
             'email' => 'admin@test.com',
         ]);
 
-        $this->addSql("insert into user set nickname = :nickname, roles = :roles, password = :password, email = :email, created_at = now(), updated_at = now(); ", [
-            'nickname' => 'User_test',
-            'roles' => json_encode(['ROLE_USER']),
-            'password' => password_hash('hrr6324047JGv5U43Oe48../,.a=1pza;a3p',3),
-            'email' => 'user@test.com',
-        ]);
     }
 
     public function down(Schema $schema) : void

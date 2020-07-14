@@ -12,13 +12,14 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
-class ProjectCreatingController extends AbstractController
+class ProjectCrudController extends AbstractController
 {
     /**
      * @Route(path="/project/create", name="creating")
      * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function creatingProjectForm (Request $request)
+    public function creatingProject (Request $request)
     {
         $user= $this->get('security.token_storage')->getToken()->getUser();
         $project = new ProjectInfo();
@@ -34,8 +35,7 @@ class ProjectCreatingController extends AbstractController
 
             $createDir = ProjectDataService::createProjectFolder($project, $user);
 
-            if($pushToDBSuccesfull and $createDir)
-            {
+            if($pushToDBSuccesfull and $createDir) {
                 $route = '/user/' . $user->getId() . '/' . $project->getProjectName();
             } else {
                 $route = '/exception';
@@ -43,8 +43,7 @@ class ProjectCreatingController extends AbstractController
 
             dd($route);
 
-            return $this->redirectToRoute($route);
-
+            return $this->redirect($route);
         }
 
         $log = UserDataService::isLogged($user);
@@ -54,6 +53,38 @@ class ProjectCreatingController extends AbstractController
             'log' => $log,
             'projectCreate' => $form->createView(),
         ]);
+    }
 
+    /**
+     * @Route(path="/user/{id}/my_project_list", name="project_list", methods={"GET", "POST"})
+     * @param Request $request
+     * @param $id
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     */
+    public function MyProjectList(Request $request, $id)
+    {
+        $user = $this->get('security.token_storage')->getToken()->getUser();
+        $em = $this->getDoctrine()->getManager();
+        $verifyUser = UserDataService::verifyUser($user, $id);
+        $log = UserDataService::isLogged($user);
+
+        if(!$log) {
+            return $this->redirect('/');
+        }
+
+        if(!$verifyUser) {
+            $route = '/user/' . $user->getId() . '/my_project_list';
+            return $this->redirect($route);
+        }
+
+        $projectList = $em->getRepository(ProjectInfo::class)->findBy(['user'=>$user]);
+
+        $info = ProjectDataService::getProjectInfoForListing($projectList);
+
+        return $this->render('project/my_p_list.html.twig', [
+            'log' => $log,
+            'informationList' => $info,
+            'user' => $user,
+        ]);
     }
 }
