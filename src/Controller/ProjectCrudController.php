@@ -5,6 +5,7 @@ namespace App\Controller;
 
 
 use App\Entity\ProjectInfo;
+use App\Entity\User;
 use App\Form\ProjectCreatingFormType;
 use App\Service\ProjectDataService;
 use App\Service\UserDataService;
@@ -79,12 +80,62 @@ class ProjectCrudController extends AbstractController
 
         $projectList = $em->getRepository(ProjectInfo::class)->findBy(['user'=>$user]);
 
-        $info = ProjectDataService::getProjectInfoForListing($projectList);
+        $projectInfo = ProjectDataService::getProjectInfoForListing($projectList);
+
+        $isProjectExist = false;
+        if($projectInfo != []) {
+            $isProjectExist = true;
+        }
 
         return $this->render('project/my_p_list.html.twig', [
             'log' => $log,
-            'informationList' => $info,
+            'informationList' => $projectInfo,
             'user' => $user,
+            'isProjectsExist' => $isProjectExist,
         ]);
     }
+
+    /**
+     * @Route(path="/user/{id}/project_list", methods={"GET", "POST"})
+     * @param Request $request
+     */
+    public function UsersProjectList(Request $request, $id)
+    {
+        $user = $this->get('security.token_storage')->getToken()->getUser();
+        $em = $this->getDoctrine()->getManager();
+        $log = UserDataService::isLogged($user);
+
+        if ($log) {
+            $verifyUser = UserDataService::verifyUser($user, $id);
+            if($verifyUser) {
+                $route = '/user/' . $user->getId() . '/my_project_list';
+                return $this->redirect($route);
+            }
+        }
+
+        $user = $em->getRepository(User::class)->find($id);
+        $projectList = $em->getRepository(ProjectInfo::class)->findBy(['user'=>$user]);
+        $projectInfo = ProjectDataService::getProjectInfoForListing($projectList);
+
+        foreach ($projectInfo as $key => $value)
+        {
+            if ($value['openclose']=='Close') {
+                unset($projectInfo[$key]);
+            }
+        }
+
+        $isProjectExist = false;
+        if($projectInfo != []) {
+            $isProjectExist = true;
+        }
+
+        return $this->render('/project/p_list.html.twig', [
+            'log' => $log,
+            'user' => $user,
+            'informationList' => $projectInfo,
+            'isProjectsExist' => $isProjectExist,
+        ]);
+
+    }
+
 }

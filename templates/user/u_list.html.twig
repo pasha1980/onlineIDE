@@ -1,0 +1,32 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    User List
+{% endblock %}
+
+{% block body %}
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>Number</th>
+            <th>NickName</th>
+            <th>Company</th>
+            <th>About me</th>
+            <th>Created At</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for info in informationList %}
+            <tr>
+                <td>{{ info.number }}</td>
+                <td><a href="/user/{{ info.user.id }}">{{ info.user.nickname }}</a></td>
+                <td>{{ info.user.company }}</td>
+                <td>{{ info.user.description }}</td>
+                <td>{{ info.user.createdAt.format('d/m/Y') }}</td>
+                <td><a href="/user/{{ info.user.id }}/project_list" class="btn btn-primary">His projects</a></td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

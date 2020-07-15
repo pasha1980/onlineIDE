@@ -110,6 +110,7 @@ class User implements UserInterface
         $roles[] = 'ROLE_USER';
         $roles[] = 'ROLE_ADMIN';
         return array_unique($roles);
+        return $roles;
     }
 
     public function setRoles(array $roles): self

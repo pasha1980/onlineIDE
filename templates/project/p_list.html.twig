@@ -1,7 +1,7 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}
-    My projects
+    Users projects
 {% endblock %}
 
 {% block body %}
@@ -12,9 +12,7 @@
             <th>Number</th>
             <th>Name</th>
             <th>Type</th>
-            <th>Open/Close</th>
             <th>Created At</th>
-            <th>Updated At</th>
             <th></th>
         </tr>
         </thead>
@@ -24,15 +22,13 @@
                 <td>{{ info.myNumber }}</td>
                 <td>{{ info.project.projectName }}</td>
                 <td>{{ info.type }}</td>
-                <td><b style="color: {{ info.color }}">{{ info.openclose }}</b></td>
                 <td>{{ info.project.createdAt.format('d/m/Y') }}</td>
-                <td>{{ info.project.updatedAt.format('d/m/Y') }}</td>
-                <td><a href="/user/{{ user.id }}/{{ info.project.projectName }}" class="btn btn-primary">Edit</a></td>
+                <td><a href="/user/{{ user.id }}/{{ info.project.projectName }}" class="btn btn-primary">View</a></td>
             </tr>
         {% endfor %}
         </tbody>
     </table>
     {% else %}
-        <a href="/project/create"><h1>Create project</h1></a>
+        <h1>Sorry</h1>
     {% endif %}
 {% endblock %}

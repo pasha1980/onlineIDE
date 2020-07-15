@@ -76,11 +76,13 @@ class ProjectDataService
     public static function getProjectInfoForListing(array $projectList) :array
     {
         $info = [];
+        $openNumber = 0;
         for ($i=0; $i < count($projectList); $i++)
         {
             if($projectList[$i]->getIsOpen()) {
                 $openClose = "Open";
                 $color = 'green';
+                $openNumber++;
             } else {
                 $openClose = "Close";
                 $color = 'red';
@@ -97,11 +99,12 @@ class ProjectDataService
             }
 
             $info[$i] = [
-                'number' => ($i+1),
+                'myNumber' => ($i+1),
                 'project' => $projectList[$i],
                 'openclose' => $openClose,
                 'type' => $type,
                 'color' => $color,
+                'openNumber' => $openNumber,
             ];
         }
         return $info;
