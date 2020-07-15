@@ -98,6 +98,7 @@ class ProjectCrudController extends AbstractController
     /**
      * @Route(path="/user/{id}/project_list", methods={"GET", "POST"})
      * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function UsersProjectList(Request $request, $id)
     {
