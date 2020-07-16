@@ -6,6 +6,7 @@ namespace App\Service;
 
 
 use App\Entity\User;
+use Doctrine\ORM\EntityManagerInterface;
 
 class UserDataService
 {
@@ -65,5 +66,4 @@ class UserDataService
         }
         return $info;
     }
-
 }

@@ -57,7 +57,7 @@ class ProjectCrudController extends AbstractController
     }
 
     /**
-     * @Route(path="/user/{id}/my_project_list", name="project_list", methods={"GET", "POST"})
+     * @Route(path="/user/{id}/my_project_list", name="project_list", methods={"GET"})
      * @param Request $request
      * @param $id
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
@@ -96,7 +96,7 @@ class ProjectCrudController extends AbstractController
     }
 
     /**
-     * @Route(path="/user/{id}/project_list", methods={"GET", "POST"})
+     * @Route(path="/user/{id}/project_list", methods={"GET"})
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */

@@ -1,0 +1,34 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    User Page
+{% endblock %}
+
+{% block body %}
+    {% if verify %}
+        <h2>My Page</h2>
+    {% else %}
+        <h2>{{ user.nickname }} Page</h2>
+    {% endif %}
+    Nickname: {{ user.nickname }}
+    <br>
+    Email: {{ user.email }}
+    <br>
+    Work with "Eren" from {{ user.createdAt.format('d/m/Y') }}
+    <br>
+    {% if user.company %}
+        My company: {{ user.company }}
+        <br>
+    {% endif %}
+    {% if user.description %}
+        About me: {{ user.description }}
+        <br>
+    {% endif %}
+    {% if verify %}
+        <br>
+        <a href="/user/{{ user.id }}/edit">Edit data</a>
+        <br>
+        <a href="/user/{{ user.id }}/pass_change">Change password</a>
+    {% endif %}
+
+{% endblock %}
