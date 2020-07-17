@@ -42,8 +42,6 @@ class ProjectCrudController extends AbstractController
                 $route = '/exception';
             }
 
-            dd($route);
-
             return $this->redirect($route);
         }
 
@@ -114,8 +112,8 @@ class ProjectCrudController extends AbstractController
             }
         }
 
-        $user = $em->getRepository(User::class)->find($id);
-        $projectList = $em->getRepository(ProjectInfo::class)->findBy(['user'=>$user]);
+        $anotherUser = $em->getRepository(User::class)->find($id);
+        $projectList = $em->getRepository(ProjectInfo::class)->findBy(['user'=>$anotherUser]);
         $projectInfo = ProjectDataService::getProjectInfoForListing($projectList);
 
         foreach ($projectInfo as $key => $value)
@@ -135,6 +133,7 @@ class ProjectCrudController extends AbstractController
             'user' => $user,
             'informationList' => $projectInfo,
             'isProjectsExist' => $isProjectExist,
+            'currentUser' => $anotherUser,
         ]);
 
     }

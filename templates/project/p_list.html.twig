@@ -23,7 +23,7 @@
                 <td>{{ info.project.projectName }}</td>
                 <td>{{ info.type }}</td>
                 <td>{{ info.project.createdAt.format('d/m/Y') }}</td>
-                <td><a href="/user/{{ user.id }}/{{ info.project.projectName }}" class="btn btn-primary">View</a></td>
+                <td><a href="/user/{{ currentUser.id }}/{{ info.project.projectName }}" class="btn btn-primary">View</a></td>
             </tr>
         {% endfor %}
         </tbody>

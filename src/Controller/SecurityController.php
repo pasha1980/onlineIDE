@@ -5,8 +5,10 @@ namespace App\Controller;
 
 
 use App\Entity\User;
+use App\Form\PasswordChangeFormType;
 use App\Form\RegistrationFormType;
 use App\Security\UserAuthenticator;
+use App\Service\UserDataService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -55,10 +57,6 @@ class SecurityController extends AbstractController
                 )
             );
 
-            /**
-             * @todo: release javascript: check if it is a space in name and replace ' ' with '_'
-             */
-
             $name = $user->getNickname();
             $newName = str_replace(' ', '_', $name);
             $user->setNickname($newName);
@@ -97,6 +95,61 @@ class SecurityController extends AbstractController
     public function logout()
     {
         throw new \LogicException('This method can be blank - it will be intercepted by the logout key on your firewall.');
+    }
+
+    /**
+     * @Route(path="/pass_change")
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
+     */
+    public function passwordChange(Request $request)
+    {
+        $user = $this->get('security.token_storage')->getToken()->getUser();
+        $log = UserDataService::isLogged($user);
+        if(!$log) {
+            return $this->redirect('/');
+        }
+
+        $form = $this->createForm(PasswordChangeFormType::class);
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+
+            $data = $form->getData();
+            $em = $this->getDoctrine()->getManager();
+
+            if (password_verify($data['oldPassword'], $user->getPassword())) {
+                if ($data['newPassword'] === $data['repeatNewPassword']) {
+                    $hash = password_hash($data['newPassword'], 3);
+                    $user->setPassword($hash);
+                    $em->persist($user);
+                    $em->flush();
+                    return $this->redirect('/user/' . $user->getId());
+
+                } else {
+                    return $this->render('security/password_change.html.twig', [
+                        'log' => $log,
+                        'user' => $user,
+                        'form' => $form->createView(),
+                        'warning' => 'New passwords do not match',
+                    ]);
+                }
+            } else {
+                return $this->render('security/password_change.html.twig', [
+                    'log' => $log,
+                    'user' => $user,
+                    'form' => $form->createView(),
+                    'warning' => 'Wrong user password entered',
+                ]);
+            }
+        }
+
+        return $this->render('security/password_change.html.twig', [
+            'log' => $log,
+            'user' => $user,
+            'form' => $form->createView(),
+            'warning' => null,
+        ]);
+
     }
 
 }

@@ -8,27 +8,27 @@
     {% if verify %}
         <h2>My Page</h2>
     {% else %}
-        <h2>{{ user.nickname }} Page</h2>
+        <h2>{{ currentUser.nickname }} Page</h2>
     {% endif %}
-    Nickname: {{ user.nickname }}
+    Nickname: {{ currentUser.nickname }}
     <br>
-    Email: {{ user.email }}
+    Email: {{ currentUser.email }}
     <br>
-    Work with "Eren" from {{ user.createdAt.format('d/m/Y') }}
+    Work with "Eren" from {{ currentUser.createdAt.format('d/m/Y') }}
     <br>
-    {% if user.company %}
-        My company: {{ user.company }}
+    {% if currentUser.company %}
+        My company: {{ currentUser.company }}
         <br>
     {% endif %}
-    {% if user.description %}
-        About me: {{ user.description }}
+    {% if currentUser.description %}
+        About me: {{ currentUser.description }}
         <br>
     {% endif %}
     {% if verify %}
         <br>
-        <a href="/user/{{ user.id }}/edit">Edit data</a>
+        <a href="/user/{{ currentUser.id }}/edit">Edit data</a>
         <br>
-        <a href="/user/{{ user.id }}/pass_change">Change password</a>
+        <a href="/pass_change">Change password</a>
     {% endif %}
 
 {% endblock %}

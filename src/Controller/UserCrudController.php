@@ -4,10 +4,8 @@
 namespace App\Controller;
 
 
-use App\Entity\ProjectInfo;
 use App\Entity\User;
 use App\Form\EndRegistrationFormType;
-use App\Form\ProjectCreatingFormType;
 use App\Service\UserDataService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -63,7 +61,8 @@ class UserCrudController extends AbstractController
 
         return $this->render('user/u_page.html.twig', [
             'log' => $log,
-            'user' => $currentUser,
+            'currentUser' => $currentUser,
+            'user' => $user,
             'verify' => $verifyUser,
         ]);
     }

@@ -44,14 +44,23 @@ class ProjectDataService
         $projectInfo->setCountOfFiles(0);
         $projectInfo->setCountOfFolders(0);
         $projectInfo->setCountOfLines(0);
-        try {
-            $entityManager->persist($projectInfo);
-            $entityManager->flush();
-            return true;
-        } catch (\Exception $e) {
-            return false;
-        }
 
+        $test = $entityManager->getRepository(ProjectInfo::class)->findBy([
+            'projectName' => $newName,
+            'user' => $user
+        ]);
+
+        if ($test != []) {
+            return false;
+        } else {
+            try {
+                $entityManager->persist($projectInfo);
+                $entityManager->flush();
+                return true;
+            } catch (\Exception $e) {
+                return false;
+            }
+        }
     }
 
     public static function createProjectFolder(ProjectInfo $projectInfo, User $user) :bool
@@ -109,5 +118,6 @@ class ProjectDataService
         }
         return $info;
     }
+
 
 }
