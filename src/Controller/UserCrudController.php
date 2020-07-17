@@ -68,12 +68,12 @@ class UserCrudController extends AbstractController
     }
 
     /**
-     * @Route(path="/user/{id}/edit", name="user_edit", methods={"GET", "POST"})
+     * @Route(path="/edit", name="user_edit", methods={"GET", "POST"})
      * @param Request $request
      * @param $id
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function editUserData(Request $request, $id)
+    public function editUserData(Request $request)
     {
         $user = $this->get('security.token_storage')->getToken()->getUser();
         $log = UserDataService::isLogged($user);
@@ -82,18 +82,12 @@ class UserCrudController extends AbstractController
             return $this->redirect('/');
         }
 
-        $verifyUser = UserDataService::verifyUser($user, $id);
-
-        if(!$verifyUser) {
-            $route = '/user/' . $user->getId() . '/edit';
-            return $this->redirect($route);
-        }
-
         $form = $this->createForm(EndRegistrationFormType::class, $user);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
+        if ($form->isSubmitted()) {
             $user = $form->getData();
+            $user->setUpdatedAt(new \DateTime('now'));
             $em = $this->getDoctrine()->getManager();
             $em->persist($user);
             $em->flush();

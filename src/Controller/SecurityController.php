@@ -101,6 +101,7 @@ class SecurityController extends AbstractController
      * @Route(path="/pass_change")
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
+     * @throws \Exception
      */
     public function passwordChange(Request $request)
     {
@@ -121,6 +122,7 @@ class SecurityController extends AbstractController
                 if ($data['newPassword'] === $data['repeatNewPassword']) {
                     $hash = password_hash($data['newPassword'], 3);
                     $user->setPassword($hash);
+                    $user->setUpdatedAt(new \DateTime('now'));
                     $em->persist($user);
                     $em->flush();
                     return $this->redirect('/user/' . $user->getId());

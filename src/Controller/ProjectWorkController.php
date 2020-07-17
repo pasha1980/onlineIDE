@@ -6,7 +6,9 @@ namespace App\Controller;
 
 use App\Entity\ProjectInfo;
 use App\Entity\User;
-use App\Service\ProjectDataService;
+use App\Form\CreateFileFormType;
+use App\Form\CreateFolderFormType;
+use App\Service\ProjectWorkService;
 use App\Service\UserDataService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,15 +17,17 @@ use Symfony\Component\Routing\Annotation\Route;
 class ProjectWorkController extends AbstractController
 {
     /**
-     * @Route(path="/user/{id}/{projectName}", methods={"GET", "POST"})
+     * @Route(path="/project/{id}/{projectName}", methods={"GET", "POST"})
      * @param Request $request
      * @param $id
      * @param $projectName
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function ProjectPage(Request $request, $id, $projectName)
+    public function ProjectPage(Request $request, int $id, string $projectName)
     {
         $user = $this->get('security.token_storage')->getToken()->getUser();
+        $log = UserDataService::isLogged($user);
+
         $em = $this->getDoctrine()->getManager();
         $currentUser = $em->getRepository(User::class)->find($id);
         $project = $em->getRepository(ProjectInfo::class)->findOneBy([
@@ -45,10 +49,33 @@ class ProjectWorkController extends AbstractController
             return $this->redirect('/user/' . $currentUser->getId());
         }
 
-        /**
-         * @todo: !!! view project and create file/folder
-         */
+        $em = $this->getDoctrine()->getManager();
 
-        die;
+        $newFileForm = $this->createForm(CreateFileFormType::class);
+        $newFolderForm = $this->createForm(CreateFolderFormType::class);
+
+        $newFileForm->handleRequest($request);
+        if($newFileForm->isSubmitted()) {
+            $data = $newFileForm->getData();
+            if ($newProject = ProjectWorkService::CreateFolder($em, $data['folderName'], $project)) {
+
+            }
+
+        }
+
+        $newFolderForm->handleRequest($request);
+        if($newFolderForm->isSubmitted()) {
+            $data = $newFolderForm->getData();
+            dd($data);
+        }
+
+        return $this->render('/project/p_view.html.twig', [
+            'log' => $log,
+            'user' => $user,
+            'currentUser' => $currentUser,
+            'newFolder' => $newFolderForm->createView(),
+            'newFile' => $newFileForm->createView(),
+//            'info' => $info,
+        ]);
     }
 }

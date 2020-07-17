@@ -37,7 +37,7 @@ class ProjectCrudController extends AbstractController
             $createDir = ProjectDataService::createProjectFolder($project, $user);
 
             if($pushToDBSuccesfull and $createDir) {
-                $route = '/user/' . $user->getId() . '/' . $project->getProjectName();
+                $route = '/project/' . $user->getId() . '/' . $project->getProjectName();
             } else {
                 $route = '/exception';
             }
@@ -53,6 +53,10 @@ class ProjectCrudController extends AbstractController
             'projectCreate' => $form->createView(),
         ]);
     }
+
+    /**
+     * @todo: Change urls
+     */
 
     /**
      * @Route(path="/user/{id}/my_project_list", name="project_list", methods={"GET"})

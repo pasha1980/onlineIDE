@@ -27,7 +27,7 @@
                 <td><b style="color: {{ info.color }}">{{ info.openclose }}</b></td>
                 <td>{{ info.project.createdAt.format('d/m/Y') }}</td>
                 <td>{{ info.project.updatedAt.format('d/m/Y') }}</td>
-                <td><a href="/user/{{ user.id }}/{{ info.project.projectName }}" class="btn btn-primary">Edit</a></td>
+                <td><a href="/project/{{ user.id }}/{{ info.project.projectName }}" class="btn btn-primary">Edit</a></td>
             </tr>
         {% endfor %}
         </tbody>
