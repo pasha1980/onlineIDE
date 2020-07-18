@@ -15,7 +15,9 @@ class CreateFolderFormType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('folderName', TextType::class)
+            ->add('folderName', TextType::class, [
+                'data' => null,
+            ])
             ->add('Submit', SubmitType::class)
         ;
     }

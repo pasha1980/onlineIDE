@@ -73,7 +73,7 @@ class ProjectDataService
          */
 
         $path = str_replace('/src/Service', '/Users/' . $uName . '/', __DIR__);
-        $createDir = mkdir($path . $pName, 0777, true);
+        $createDir = mkdir($path . $pName, 0777, false);
         if($createDir) {
             return true;
         } else {

@@ -54,9 +54,6 @@ class ProjectCrudController extends AbstractController
         ]);
     }
 
-    /**
-     * @todo: Change urls
-     */
 
     /**
      * @Route(path="/user/{id}/my_project_list", name="project_list", methods={"GET"})

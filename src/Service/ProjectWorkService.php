@@ -11,15 +11,62 @@ class ProjectWorkService
 {
     public static function CreateFolder(EntityManager $entityManager, string $folder, string $path, ProjectInfo $projectInfo) :?ProjectInfo
     {
+        $folder = str_replace(' ', '_', $folder);
+        $dirPath = str_replace('src/Service', 'Users/' . $projectInfo->getUser()->getNickname() . '/' . $projectInfo->getProjectName() . '/' . $path, __DIR__);
+        $projectInfo->setCountOfFolders($projectInfo->getCountOfFolders()+1);
+        $projectInfo->setUpdatedAt(new \DateTime('now'));
+        $folders = $projectInfo->getFolders();
+        array_push($folders, $dirPath . $folder);
+        $projectInfo->setFolders($folders);
 
+        try {
+            $entityManager->persist($projectInfo);
+            $entityManager->flush();
+        } catch (\Exception $e) {
+            return null;
+        }
 
-        return null;
+        $createDir = mkdir($dirPath . $folder, 0777);
+        if ($createDir) {
+            return $projectInfo;
+        } else {
+            return null;
+        }
     }
 
     public static function CreateFile(EntityManager $entityManager, string $file, string $path, ProjectInfo $projectInfo) :?ProjectInfo
     {
+        $file = str_replace(' ', '_', $file);
+        $filePath = str_replace('src/Service', 'Users/' . $projectInfo->getUser()->getNickname() . '/' . $projectInfo->getProjectName() . '/' . $path, __DIR__);
+        $projectInfo->setCountOfFiles($projectInfo->getCountOfFiles()+1);
+        $projectInfo->setUpdatedAt(new \DateTime('now'));
+        $filenames = $projectInfo->getFilenames();
+        array_push($filenames, $filePath . $file);
+        $projectInfo->setFilenames($filenames);
 
+        try {
+            $entityManager->persist($projectInfo);
+            $entityManager->flush();
+        } catch (\Exception $e) {
+            return null;
+        }
 
-        return null;
+        $createFile = fopen($filePath . $file, 'x');
+        if($createFile) {
+            return $projectInfo;
+        } else {
+            return null;
+        }
+    }
+
+    public static function GetProjectInfoForWork(ProjectInfo $projectInfo) :array
+    {
+        $info = [];
+
+        /**
+         * @todo: release project work info getter
+         */
+
+        return $info;
     }
 }

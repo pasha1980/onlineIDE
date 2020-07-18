@@ -15,7 +15,9 @@ class CreateFileFormType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('fileName', TextType::class)
+            ->add('fileName', TextType::class, [
+                'data' => null,
+            ])
             ->add('Submit', SubmitType::class)
         ;
     }

@@ -6,7 +6,10 @@
 
 {% block body %}
 
+    {% if user == currentUser %}
     {{ form(newFolder) }}
     <hr>
     {{ form(newFile) }}
+    {% endif %}
+
 {% endblock %}
