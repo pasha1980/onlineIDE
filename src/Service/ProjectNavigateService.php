@@ -6,8 +6,9 @@ namespace App\Service;
 
 use App\Entity\ProjectInfo;
 use Doctrine\ORM\EntityManager;
+use Symfony\Component\Config\Definition\Exception\Exception;
 
-class ProjectWorkService
+class ProjectNavigateService
 {
     public static function CreateFolder(EntityManager $entityManager, string $folder, string $path, ProjectInfo $projectInfo) :?ProjectInfo
     {
@@ -36,10 +37,7 @@ class ProjectWorkService
         }
 
         $projectInfo->setFolders($folders);
-
         $projectInfo->setCountOfFolders($projectInfo->getCountOfFolders()+1+$countOfSlashes);
-
-//        dd($projectInfo);
 
         try {
             $entityManager->persist($projectInfo);
@@ -69,6 +67,7 @@ class ProjectWorkService
         if($countOfSlashes) {
             $folders = $projectInfo->getFolders();
             preg_match_all('/[a-zA-Z0-9()_]+\//', $file, $exFolder);
+
             for ($i = 0; $i<count($exFolder[0]); $i++) {
                 $exFolder[0][$i] = str_replace('/', '', $exFolder[0][$i]);
             }
@@ -84,7 +83,14 @@ class ProjectWorkService
             }
             preg_match('/[a-zA-Z0-9()_]+\.[a-z]+/', $file, $exFile);
             array_push($filenames, $filePath . $exPath . '/' . $exFile[0]);
+            try {
+                $createDir = mkdir($filePath . $exPath, 0777, true);
+            } catch (\Exception $e) {
+                die('folder');
+            }
+
             $projectInfo->setFolders($folders);
+
         } else {
             array_push($filenames, $filePath . $file);
         }
@@ -95,20 +101,27 @@ class ProjectWorkService
             $entityManager->persist($projectInfo);
             $entityManager->flush();
         } catch (\Exception $e) {
+            die('entity');
             return null;
         }
 
         try {
-            $createFile = fopen($filePath . $file, 'x');
+            $createFile = fopen($filePath . $file, 'w');
         } catch (\Exception $e) {
+            die('file');
             return null;
         }
 
         if($createFile) {
             return $projectInfo;
         } else {
+            die('if else');
             return null;
         }
+
+        /**
+         * @todo: when ending - change all "die" on exception
+         */
     }
 
     public static function GetProjectInfoForWork(ProjectInfo $projectInfo, string $path) :array
@@ -137,5 +150,20 @@ class ProjectWorkService
         }
 
         return $info;
+    }
+
+    public static function isPathValid(ProjectInfo $projectInfo, string $path) :bool
+    {
+        $path = str_replace('src/Service', 'Users/' . $projectInfo->getUser()->getNickname() . '/' . $projectInfo->getProjectName(), __DIR__) . '/' . $path;
+        $foldersList = $projectInfo->getFolders();
+        foreach ($foldersList as $value) {
+            if($path === $value) {
+                $valid = true;
+                break;
+            } else {
+                $valid = false;
+            }
+        }
+        return $valid;
     }
 }

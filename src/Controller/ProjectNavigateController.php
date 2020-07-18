@@ -8,13 +8,13 @@ use App\Entity\ProjectInfo;
 use App\Entity\User;
 use App\Form\CreateFileFormType;
 use App\Form\CreateFolderFormType;
-use App\Service\ProjectWorkService;
+use App\Service\ProjectNavigateService;
 use App\Service\UserDataService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
-class ProjectWorkController extends AbstractController
+class ProjectNavigateController extends AbstractController
 {
     /**
      * @Route(path="/project/{id}/{projectName}", methods={"GET", "POST"})
@@ -44,7 +44,7 @@ class ProjectWorkController extends AbstractController
         $newFileForm->handleRequest($request);
         if($newFileForm->isSubmitted()) {
             $data = $newFileForm->getData();
-            if ($newProject = ProjectWorkService::CreateFile($em, $data['fileName'], '', $project)) {
+            if ($newProject = ProjectNavigateService::CreateFile($em, $data['fileName'], '', $project)) {
                 $project = $newProject;
             } else {
                 return $this->redirect('/exception');
@@ -54,14 +54,14 @@ class ProjectWorkController extends AbstractController
         $newFolderForm->handleRequest($request);
         if($newFolderForm->isSubmitted()) {
             $data = $newFolderForm->getData();
-            if ($newProject = ProjectWorkService::CreateFolder($em, $data['folderName'], '', $project)) {
+            if ($newProject = ProjectNavigateService::CreateFolder($em, $data['folderName'], '', $project)) {
                 $project = $newProject;
             } else {
                 return $this->redirect('/exception');
             }
         }
 
-        $info = ProjectWorkService::GetProjectInfoForWork($project, '');
+        $info = ProjectNavigateService::GetProjectInfoForWork($project, '');
 
         return $this->render('/project/p_view.html.twig', [
             'log' => $log,
@@ -71,7 +71,7 @@ class ProjectWorkController extends AbstractController
             'newFile' => $newFileForm->createView(),
             'informationList' => $info,
             'project' => $project,
-            'currentPath' => '/project/' . $user->getId() . '/' . $project->getProjectName() . '/'
+            'currentPath' => '/project/' . $currentUser->getId() . '/' . $project->getProjectName() . '/'
         ]);
     }
 
@@ -85,7 +85,6 @@ class ProjectWorkController extends AbstractController
      */
     public function ProjectPath(Request $request, int $id, string $projectName, string $path)
     {
-        $path = $path . '/';
         $user = $this->get('security.token_storage')->getToken()->getUser();
         $log = UserDataService::isLogged($user);
         $em = $this->getDoctrine()->getManager();
@@ -99,13 +98,18 @@ class ProjectWorkController extends AbstractController
             return $this->redirect('/user/' . $id);
         }
 
+        if (!ProjectNavigateService::isPathValid($project, $path)) {
+            return $this->redirect('/project/' . $currentUser->getId() . '/' . $project->getProjectName());
+        }
+
+        $path = $path . '/';
         $newFileForm = $this->createForm(CreateFileFormType::class);
         $newFolderForm = $this->createForm(CreateFolderFormType::class);
 
         $newFileForm->handleRequest($request);
         if($newFileForm->isSubmitted()) {
             $data = $newFileForm->getData();
-            if ($newProject = ProjectWorkService::CreateFile($em, $data['fileName'], $path, $project)) {
+            if ($newProject = ProjectNavigateService::CreateFile($em, $data['fileName'], $path, $project)) {
                 $project = $newProject;
             } else {
                 return $this->redirect('/exception');
@@ -115,14 +119,14 @@ class ProjectWorkController extends AbstractController
         $newFolderForm->handleRequest($request);
         if($newFolderForm->isSubmitted()) {
             $data = $newFolderForm->getData();
-            if ($newProject = ProjectWorkService::CreateFolder($em, $data['folderName'], $path, $project)) {
+            if ($newProject = ProjectNavigateService::CreateFolder($em, $data['folderName'], $path, $project)) {
                 $project = $newProject;
             } else {
                 return $this->redirect('/exception');
             }
         }
 
-        $info = ProjectWorkService::GetProjectInfoForWork($project, $path);
+        $info = ProjectNavigateService::GetProjectInfoForWork($project, $path);
 
         return $this->render('/project/p_view.html.twig', [
             'log' => $log,
@@ -132,40 +136,8 @@ class ProjectWorkController extends AbstractController
             'newFile' => $newFileForm->createView(),
             'informationList' => $info,
             'project' => $project,
-            'currentPath' => '/project/' . $user->getId() . '/' . $project->getProjectName() . '/' . $path,
+            'currentPath' => '/project/' . $currentUser->getId() . '/' . $project->getProjectName() . '/' . $path,
         ]);
 
-    }
-
-    /**
-     * @Route(path="/project/{id}/{projectName}/{fileName}", methods={"GET", "POST"}, requirements={"fileName"="[a-zA-Z0-9_.()]+\.[a-z]+"})
-     * @param Request $request
-     * @param int $id
-     * @param string $projectName
-     * @param string $fileName
-     */
-    public function ProjectFile(Request $request, int $id, string $projectName, string $fileName)
-    {
-        dd($fileName, 'file');
-
-        /**
-         * @todo: release working with file
-         */
-    }
-
-    /**
-     * @Route(path="/project/{id}/{projectName}/{path}/{fileName}", methods={"GET", "POST"}, requirements={"path" = ".+(?=(\/[a-zA-Z0-9_.()]+\.[a-z]+)|\/)", "fileName" = "[a-zA-Z0-9_.()]+\.[a-z]+"})
-     * @param Request $request
-     * @param int $id
-     * @param string $projectName
-     * @param string $path
-     * @param string $fileName
-     */
-    public function ProjectPathFile(Request $request, int $id, string $projectName, string $path, string $fileName)
-    {
-        dd($path = $path . '/', $fileName, 'path with file name');
-        /**
-         * @todo: release working with path and file
-         */
     }
 }
