@@ -10,6 +10,29 @@
     {{ form(newFolder) }}
     <hr>
     {{ form(newFile) }}
+    {% else %}
+        <h2>{{ project.projectName }}</h2>
     {% endif %}
+
+    <table class="table table-striped">
+        <thead>
+        </thead>
+        <tbody>
+        {% for folder in informationList.folder %}
+            <tr>
+                <td>Folder</td>
+                <td>{{ folder }}</td>
+                <td><a href="/project/{{ user.id }}/{{ project.projectName }}/{{ folder }}" class="btn btn-primary">Open</a></td>
+            </tr>
+        {% endfor %}
+        {% for file in informationList.file %}
+            <tr>
+                <td>File</td>
+                <td>{{ file }}</td>
+                <td><a href="/project/{{ user.id }}/{{ project.projectName }}/{{ file }}" class="btn btn-primary">Edit</a></td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
 
 {% endblock %}

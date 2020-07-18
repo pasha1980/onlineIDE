@@ -61,7 +61,7 @@ class ProjectWorkController extends AbstractController
             }
         }
 
-        $info = ProjectWorkService::GetProjectInfoForWork($project);
+        $info = ProjectWorkService::GetProjectInfoForWork($project, '');
 
         return $this->render('/project/p_view.html.twig', [
             'log' => $log,
@@ -69,7 +69,8 @@ class ProjectWorkController extends AbstractController
             'currentUser' => $currentUser,
             'newFolder' => $newFolderForm->createView(),
             'newFile' => $newFileForm->createView(),
-            'info' => $info,
+            'informationList' => $info,
+            'project' => $project,
         ]);
     }
 

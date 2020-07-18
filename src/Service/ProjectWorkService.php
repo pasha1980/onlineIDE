@@ -26,7 +26,7 @@ class ProjectWorkService
             return null;
         }
 
-        $createDir = mkdir($dirPath . $folder, 0777);
+        $createDir = mkdir($dirPath . $folder, 0777, true);
         if ($createDir) {
             return $projectInfo;
         } else {
@@ -51,7 +51,12 @@ class ProjectWorkService
             return null;
         }
 
-        $createFile = fopen($filePath . $file, 'x');
+        try {
+            $createFile = fopen($filePath . $file, 'x');
+        } catch (\Exception $e) {
+            return null;
+        }
+
         if($createFile) {
             return $projectInfo;
         } else {
@@ -59,13 +64,30 @@ class ProjectWorkService
         }
     }
 
-    public static function GetProjectInfoForWork(ProjectInfo $projectInfo) :array
+    public static function GetProjectInfoForWork(ProjectInfo $projectInfo, string $path) :array
     {
-        $info = [];
+        $info = [
+            'folder' => [],
+            'file' => [],
+        ];
 
-        /**
-         * @todo: release project work info getter
-         */
+        $folders = $projectInfo->getFolders();
+        $files = $projectInfo->getFilenames();
+        $currentPath = str_replace('src/Service', 'Users/' . $projectInfo->getUser()->getNickname() . '/' . $projectInfo->getProjectName() . '/' . $path, __DIR__);
+
+        foreach ($folders as $value) {
+            $directory = str_replace($currentPath, '', $value);
+            if(!strpos($directory, '/')) {
+                array_push($info['folder'], $directory);
+            }
+        }
+
+        foreach ($files as $value) {
+            $directory = str_replace($currentPath, '', $value);
+            if(!strpos($directory, '/')) {
+                array_push($info['file'], $directory);
+            }
+        }
 
         return $info;
     }
