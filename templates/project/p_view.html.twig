@@ -22,14 +22,14 @@
             <tr>
                 <td>Folder</td>
                 <td>{{ folder }}</td>
-                <td><a href="/project/{{ user.id }}/{{ project.projectName }}/{{ folder }}" class="btn btn-primary">Open</a></td>
+                <td><a href="{{ currentPath }}{{ folder }}" class="btn btn-primary">Open</a></td>
             </tr>
         {% endfor %}
         {% for file in informationList.file %}
             <tr>
                 <td>File</td>
                 <td>{{ file }}</td>
-                <td><a href="/project/{{ user.id }}/{{ project.projectName }}/{{ file }}" class="btn btn-primary">Edit</a></td>
+                <td><a href="{{ currentPath }}{{ file }}" class="btn btn-primary">Edit</a></td>
             </tr>
         {% endfor %}
         </tbody>

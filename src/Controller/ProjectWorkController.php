@@ -71,6 +71,7 @@ class ProjectWorkController extends AbstractController
             'newFile' => $newFileForm->createView(),
             'informationList' => $info,
             'project' => $project,
+            'currentPath' => '/project/' . $user->getId() . '/' . $project->getProjectName() . '/'
         ]);
     }
 
@@ -80,14 +81,60 @@ class ProjectWorkController extends AbstractController
      * @param int $id
      * @param string $projectName
      * @param string $path
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function ProjectPath(Request $request, int $id, string $projectName, string $path)
     {
-        dd($path = $path . '/', 'path');
+        $path = $path . '/';
+        $user = $this->get('security.token_storage')->getToken()->getUser();
+        $log = UserDataService::isLogged($user);
+        $em = $this->getDoctrine()->getManager();
+        $currentUser = $em->getRepository(User::class)->find($id);
+        $project = $em->getRepository(ProjectInfo::class)->findOneBy([
+            'projectName' => $projectName,
+            'user' => $currentUser,
+        ]);
 
-        /**
-         * @todo: release working with path of the project
-         */
+        if(!$project || $user !== $currentUser && !$project->getIsOpen()) {
+            return $this->redirect('/user/' . $id);
+        }
+
+        $newFileForm = $this->createForm(CreateFileFormType::class);
+        $newFolderForm = $this->createForm(CreateFolderFormType::class);
+
+        $newFileForm->handleRequest($request);
+        if($newFileForm->isSubmitted()) {
+            $data = $newFileForm->getData();
+            if ($newProject = ProjectWorkService::CreateFile($em, $data['fileName'], $path, $project)) {
+                $project = $newProject;
+            } else {
+                return $this->redirect('/exception');
+            }
+        }
+
+        $newFolderForm->handleRequest($request);
+        if($newFolderForm->isSubmitted()) {
+            $data = $newFolderForm->getData();
+            if ($newProject = ProjectWorkService::CreateFolder($em, $data['folderName'], $path, $project)) {
+                $project = $newProject;
+            } else {
+                return $this->redirect('/exception');
+            }
+        }
+
+        $info = ProjectWorkService::GetProjectInfoForWork($project, $path);
+
+        return $this->render('/project/p_view.html.twig', [
+            'log' => $log,
+            'user' => $user,
+            'currentUser' => $currentUser,
+            'newFolder' => $newFolderForm->createView(),
+            'newFile' => $newFileForm->createView(),
+            'informationList' => $info,
+            'project' => $project,
+            'currentPath' => '/project/' . $user->getId() . '/' . $project->getProjectName() . '/' . $path,
+        ]);
+
     }
 
     /**
