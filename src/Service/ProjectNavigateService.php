@@ -4,6 +4,7 @@
 namespace App\Service;
 
 
+use App\Entity\File;
 use App\Entity\ProjectInfo;
 use Doctrine\ORM\EntityManager;
 use Symfony\Component\Config\Definition\Exception\Exception;
@@ -82,7 +83,7 @@ class ProjectNavigateService
                 $exPath = $exPath . $slash . $exFolder[0][$i];
             }
             preg_match('/[a-zA-Z0-9()_]+\.[a-z]+/', $file, $exFile);
-            array_push($filenames, $filePath . $exPath . '/' . $exFile[0]);
+            $allPath = $filePath . $exPath . '/' . $exFile[0];
             try {
                 $createDir = mkdir($filePath . $exPath, 0777, true);
             } catch (\Exception $e) {
@@ -92,8 +93,10 @@ class ProjectNavigateService
             $projectInfo->setFolders($folders);
 
         } else {
-            array_push($filenames, $filePath . $file);
+            $allPath = $filePath . $file;
         }
+
+        array_push($filenames, $allPath);
 
         $projectInfo->setFilenames($filenames);
 
@@ -104,6 +107,16 @@ class ProjectNavigateService
             die('entity');
             return null;
         }
+
+
+        $fileEntity = new File();
+        $fileEntity->setProject($projectInfo);
+        $fileEntity->setPath($allPath);
+
+        $entityManager->persist($fileEntity);
+        $entityManager->flush();
+
+
 
         try {
             $createFile = fopen($filePath . $file, 'w');
