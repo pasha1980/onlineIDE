@@ -117,6 +117,4 @@ class ProjectDataService
         }
         return $info;
     }
-
-
 }

@@ -25,54 +25,7 @@ class ProjectNavigateController extends AbstractController
      */
     public function ProjectPage(Request $request, int $id, string $projectName)
     {
-        $user = $this->get('security.token_storage')->getToken()->getUser();
-        $log = UserDataService::isLogged($user);
-        $em = $this->getDoctrine()->getManager();
-        $currentUser = $em->getRepository(User::class)->find($id);
-        $project = $em->getRepository(ProjectInfo::class)->findOneBy([
-            'projectName' => $projectName,
-            'user' => $currentUser,
-        ]);
-
-        if(!$project || $user !== $currentUser && !$project->getIsOpen()) {
-            return $this->redirect('/user/' . $id);
-        }
-
-        $newFileForm = $this->createForm(CreateFileFormType::class);
-        $newFolderForm = $this->createForm(CreateFolderFormType::class);
-
-        $newFileForm->handleRequest($request);
-        if($newFileForm->isSubmitted()) {
-            $data = $newFileForm->getData();
-            if ($newProject = ProjectNavigateService::CreateFile($em, $data['fileName'], '', $project)) {
-                $project = $newProject;
-            } else {
-                return $this->redirect('/exception');
-            }
-        }
-
-        $newFolderForm->handleRequest($request);
-        if($newFolderForm->isSubmitted()) {
-            $data = $newFolderForm->getData();
-            if ($newProject = ProjectNavigateService::CreateFolder($em, $data['folderName'], '', $project)) {
-                $project = $newProject;
-            } else {
-                return $this->redirect('/exception');
-            }
-        }
-
-        $info = ProjectNavigateService::GetProjectInfoForWork($project, '');
-
-        return $this->render('/project/p_view.html.twig', [
-            'log' => $log,
-            'user' => $user,
-            'currentUser' => $currentUser,
-            'newFolder' => $newFolderForm->createView(),
-            'newFile' => $newFileForm->createView(),
-            'informationList' => $info,
-            'project' => $project,
-            'currentPath' => '/project/' . $currentUser->getId() . '/' . $project->getProjectName() . '/'
-        ]);
+        return $this->ProjectPath($request, $id, $projectName, null);
     }
 
     /**
@@ -83,7 +36,7 @@ class ProjectNavigateController extends AbstractController
      * @param string $path
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function ProjectPath(Request $request, int $id, string $projectName, string $path)
+    public function ProjectPath(Request $request, int $id, string $projectName, ?string $path)
     {
         $user = $this->get('security.token_storage')->getToken()->getUser();
         $log = UserDataService::isLogged($user);
@@ -98,11 +51,11 @@ class ProjectNavigateController extends AbstractController
             return $this->redirect('/user/' . $id);
         }
 
+
         if (!ProjectNavigateService::isPathValid($project, $path)) {
             return $this->redirect('/project/' . $currentUser->getId() . '/' . $project->getProjectName());
         }
 
-        $path = $path . '/';
         $newFileForm = $this->createForm(CreateFileFormType::class);
         $newFolderForm = $this->createForm(CreateFolderFormType::class);
 
@@ -128,6 +81,10 @@ class ProjectNavigateController extends AbstractController
 
         $info = ProjectNavigateService::GetProjectInfoForWork($project, $path);
 
+        $path .= '/';
+        if ($path) {
+            $path = '/' . $path;
+        }
         return $this->render('/project/p_view.html.twig', [
             'log' => $log,
             'user' => $user,
@@ -136,7 +93,7 @@ class ProjectNavigateController extends AbstractController
             'newFile' => $newFileForm->createView(),
             'informationList' => $info,
             'project' => $project,
-            'currentPath' => '/project/' . $currentUser->getId() . '/' . $project->getProjectName() . '/' . $path,
+            'currentPath' => '/project/' . $currentUser->getId() . '/' . $project->getProjectName() . $path,
         ]);
 
     }

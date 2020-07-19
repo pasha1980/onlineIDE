@@ -11,8 +11,12 @@ use Symfony\Component\Config\Definition\Exception\Exception;
 
 class ProjectNavigateService
 {
-    public static function CreateFolder(EntityManager $entityManager, string $folder, string $path, ProjectInfo $projectInfo) :?ProjectInfo
+    public static function CreateFolder(EntityManager $entityManager, string $folder, ?string $path, ProjectInfo $projectInfo) :?ProjectInfo
     {
+        if ($path) {
+            $path .= '/';
+        }
+
         $folder = str_replace(' ', '_', $folder);
         $dirPath = str_replace('src/Service', 'Users/' . $projectInfo->getUser()->getNickname() . '/' . $projectInfo->getProjectName() . '/' . $path, __DIR__);
 
@@ -55,7 +59,7 @@ class ProjectNavigateService
         }
     }
 
-    public static function CreateFile(EntityManager $entityManager, string $file, string $path, ProjectInfo $projectInfo) :?ProjectInfo
+    public static function CreateFile(EntityManager $entityManager, string $file, ?string $path, ProjectInfo $projectInfo) :?ProjectInfo
     {
         $file = str_replace(' ', '_', $file);
         $filePath = str_replace('src/Service', 'Users/' . $projectInfo->getUser()->getNickname() . '/' . $projectInfo->getProjectName() . '/' . $path, __DIR__);
@@ -137,7 +141,7 @@ class ProjectNavigateService
          */
     }
 
-    public static function GetProjectInfoForWork(ProjectInfo $projectInfo, string $path) :array
+    public static function GetProjectInfoForWork(ProjectInfo $projectInfo, ?string $path) :array
     {
         $info = [
             'folder' => [],
@@ -146,7 +150,14 @@ class ProjectNavigateService
 
         $folders = $projectInfo->getFolders();
         $files = $projectInfo->getFilenames();
-        $currentPath = str_replace('src/Service', 'Users/' . $projectInfo->getUser()->getNickname() . '/' . $projectInfo->getProjectName() . '/' . $path, __DIR__);
+
+        if($path) {
+           $path = '/' . $path . '/';
+        } else {
+            $path .= '/';
+        }
+
+        $currentPath = str_replace('src/Service', 'Users/' . $projectInfo->getUser()->getNickname() . '/' . $projectInfo->getProjectName() . $path, __DIR__);
 
         foreach ($folders as $value) {
             $directory = str_replace($currentPath, '', $value);
@@ -165,8 +176,11 @@ class ProjectNavigateService
         return $info;
     }
 
-    public static function isPathValid(ProjectInfo $projectInfo, string $path) :bool
+    public static function isPathValid(ProjectInfo $projectInfo, ?string $path) :bool
     {
+        if (!$path) {
+            return true;
+        }
         $path = str_replace('src/Service', 'Users/' . $projectInfo->getUser()->getNickname() . '/' . $projectInfo->getProjectName(), __DIR__) . '/' . $path;
         $foldersList = $projectInfo->getFolders();
         foreach ($foldersList as $value) {
