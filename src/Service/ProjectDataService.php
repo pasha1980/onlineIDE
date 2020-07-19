@@ -7,7 +7,6 @@ namespace App\Service;
 use App\Entity\ProjectInfo;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 
 class ProjectDataService
 {
